@@ -6,8 +6,8 @@ import type { AppProps } from 'next/app'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-<div>  <Component {...pageProps} />{' '}
-</div>    
+    <ThirdwebProvider desiredChainId={ChainId.Rinkeby}> <Component {...pageProps} />{' '}
+</ThirdwebProvider>
   )
 }
 
