@@ -1,8 +1,14 @@
+import { sanityClient, urlFor } from '../../sanity'
 import { useAddress, useDisconnect, useMetamask } from '@thirdweb-dev/react'
 
+import { Collection } from '../../typings'
 import React from 'react'
 
-const NFTDropPage = () => {
+interface Props{ 
+  collection:Collection
+}
+
+const NFTDropPage = ({ collection}:Props) => {
   //auth with meta mask
 
   const connectWithMetaMask = useMetamask()
@@ -21,15 +27,15 @@ const NFTDropPage = () => {
             {' '}
             <img
               className="w-44 rounded-xl object-cover lg:h-96 lg:w-72"
-              src="https://links.papareact.com/8sg"
+              src={urlFor(collection.previewImage).url()}
               alt="monk"
             />
           </div>
 
           <div className="space-y-2 p-5 text-center">
-            <h1 className="text-4xl font-bold text-white ">PAPA FAM</h1>
+            <h1 className="text-4xl font-bold text-white ">{collection.title}</h1>
             <h2 className="text-xl text-gray-300">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Repellat
+          {collection.description}
             </h2>
           </div>
         </div>
@@ -61,7 +67,7 @@ const NFTDropPage = () => {
         <div className="mt-10 flex flex-1 flex-col items-center space-y-6 text-center lg:justify-center lg:space-y-0">
           <img
             className="w-80 object-cover pb-10 lg:h-40"
-            src="https://links.papareact.com/bdy"
+            src={urlFor(collection.mainImage).url()}
             alt=""
           />
           <h1 className="text-3xl font-bold lg:text-5xl lg:font-extrabold">
@@ -80,3 +86,49 @@ const NFTDropPage = () => {
 }
 
 export default NFTDropPage
+
+
+export const getServerSideProps : GetServerSideProps = async ({params})=>{
+
+
+  const query = `
+  *[_type=="collection" && slug.current == $id][0]{
+   _id,
+   title,
+   address,
+   description,
+   nftCollectionName,
+   mainImage{
+   asset
+ }
+ ,previewImage{
+   asset
+ },
+ slug{
+   current
+ },
+ creator->{
+   _id,
+   name,
+   address,
+   slug{
+   current
+ }}}
+  `
+
+const collection = await sanityClient.fetch(query,{
+  id:params?.id
+})
+
+if(!collection)
+{
+  return {
+    notFound:true
+  }
+}
+return {
+  props: {
+    collection
+  },
+}
+}
