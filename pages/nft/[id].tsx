@@ -1,14 +1,15 @@
+import type { GetServerSideProps, NextPage } from 'next'
 import { sanityClient, urlFor } from '../../sanity'
 import { useAddress, useDisconnect, useMetamask } from '@thirdweb-dev/react'
 
 import { Collection } from '../../typings'
 import React from 'react'
 
-interface Props{ 
-  collection:Collection
+interface Props {
+  collection: Collection
 }
 
-const NFTDropPage = ({ collection}:Props) => {
+const NFTDropPage = ({ collection }: Props) => {
   //auth with meta mask
 
   const connectWithMetaMask = useMetamask()
@@ -33,10 +34,10 @@ const NFTDropPage = ({ collection}:Props) => {
           </div>
 
           <div className="space-y-2 p-5 text-center">
-            <h1 className="text-4xl font-bold text-white ">{collection.title}</h1>
-            <h2 className="text-xl text-gray-300">
-          {collection.description}
-            </h2>
+            <h1 className="text-4xl font-bold text-white ">
+              {collection.title}
+            </h1>
+            <h2 className="text-xl text-gray-300">{collection.description}</h2>
           </div>
         </div>
       </div>
@@ -60,7 +61,12 @@ const NFTDropPage = ({ collection}:Props) => {
 
           <hr className="my-2 border" />
 
-          {address && <p className="text-center text-sm text-rose-400">Logged in with wallet {address.substring(0,5)}...{address.substring(address.length - 5)}</p>}
+          {address && (
+            <p className="text-center text-sm text-rose-400">
+              Logged in with wallet {address.substring(0, 5)}...
+              {address.substring(address.length - 5)}
+            </p>
+          )}
         </div>
         <hr className="my-2 border" />
         {/* content */}
@@ -87,10 +93,7 @@ const NFTDropPage = ({ collection}:Props) => {
 
 export default NFTDropPage
 
-
-export const getServerSideProps : GetServerSideProps = async ({params})=>{
-
-
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const query = `
   *[_type=="collection" && slug.current == $id][0]{
    _id,
@@ -116,19 +119,18 @@ export const getServerSideProps : GetServerSideProps = async ({params})=>{
  }}}
   `
 
-const collection = await sanityClient.fetch(query,{
-  id:params?.id
-})
+  const collection = await sanityClient.fetch(query, {
+    id: params?.id,
+  })
 
-if(!collection)
-{
-  return {
-    notFound:true
+  if (!collection) {
+    return {
+      notFound: true,
+    }
   }
-}
-return {
-  props: {
-    collection
-  },
-}
+  return {
+    props: {
+      collection,
+    },
+  }
 }
